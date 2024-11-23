@@ -2,8 +2,35 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Hero Section -->
+<div class="text-center py-5 bg-light shadow-sm">
+    <h1 class="display-4 fw-bold text-primary">Welcome to MockInterviewsIndia</h1>
+    <p class="lead text-muted">
+        Learn and grow with <a href="https://docs.microsoft.com/aspnet/core" class="text-decoration-none text-success fw-semibold">ASP.NET Core Web Development</a>.
+    </p>
 </div>
 
+<!-- Dashboard Section -->
+<div class="container py-4">
+    <h2 class="text-center mb-4 text-secondary fw-bold">Top Technologies</h2>
+    <div class="row gx-4 gy-3">
+        @foreach (var language in Model)
+        {
+
+            <div class="col-sm-6 col-md-3">
+                <div class="@language.Value">
+                    <div class="card-body">
+                        <h3 class="text-primary fw-bold">@language.Key</h3>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <!-- Sign In and Sign Up Buttons -->
+    <div class="text-center mt-5">
+        <a class="btn btn-primary btn-lg mx-2 shadow-sm px-5" asp-area="" asp-controller="Account" asp-action="Login">Log In</a>
+        <a class="btn btn-success btn-lg mx-2 shadow-sm px-5" asp-area="" asp-controller="Account" asp-action="Register">Sign Up</a>
+    </div>
+</div>

@@ -1,24 +1,140 @@
-﻿@{
+﻿@model DashboardViewModel
+
+@{
     ViewData["Title"] = "Dashboard";
 }
 
-<h2>Welcome to your Dashboard</h2>
+<div class="container-fluid p-5">
+    <h2 class="text-center mb-4">Welcome Back, @ViewBag.UserName!</h2>
+    <p class="text-center">Everything is running smoothly! You have <a href="#" class="text-primary">3 unread alerts</a>.</p>
 
-<div>
-    <p>Hello, @User.Identity.Name! You are logged in as an @User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value.</p>
+    <!-- Top Section: Weather and Summary Cards -->
+    <div class="row mb-4">
+        <!-- Weather Widget -->
+        <div class="col-md-6 mb-4 mb-md-0">
+            <div class="card shadow-sm" style="background-image: url('/images/people.svg'); background-size: cover; background-position: center; border-radius: 15px; height: 300px;">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center text-white" style="background: rgba(0, 0, 0, 0.5); border-radius: 15px;">
+                    <h5 class="mb-3">Pune, India</h5>
+                    <h2 class="display-4">31°C</h2>
+                    <p>Sunny</p>
+                    <div class="d-flex align-items-center">
+                        <span>Perfect weather for your interviews!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Metrics -->
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-sm-6 mb-3">
+                    <div class="card p-4 text-center shadow-sm rounded">
+                        <h6>Interviews</h6>
+                        <h3 class="text-primary">JAVA</h3>
+                        <small class="text-success">Upcoming</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 mb-3">
+                    <div class="card p-4 text-center shadow-sm rounded">
+                        <h6>Attended</h6>
+                        <h3 class="text-primary">1</h3>
+                        <small class="text-success">View</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 mb-3">
+                    <div class="card p-4 text-center shadow-sm rounded">
+                        <h6>Meetings</h6>
+                        <h3 class="text-primary">34,040</h3>
+                        <small class="text-danger">-2% (30 days)</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 mb-3">
+                    <div class="card p-4 text-center shadow-sm rounded">
+                        <h6>Clients</h6>
+                        <h3 class="text-primary">47,033</h3>
+                        <small class="text-danger">-0.22% (30 days)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Topics and Interview Requests -->
+    <div class="card p-4 shadow-sm rounded">
+        <h5>Available Topics and Interview Requests</h5>
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Status</th>
+                    <th>Scheduled Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var topic in Model.Topics)
+                {
+                    var userRequestForTopic = Model.UserRequests.FirstOrDefault(r => r.TopicId == topic.Id);
+                    <tr>
+                        <td>@topic.Name</td>
+                        <td>
+                            @if (userRequestForTopic != null)
+                            {
+                                <span class="badge bg-@((userRequestForTopic.Status == "Accepted") ? "success" : (userRequestForTopic.Status == "Waiting" ? "warning" : "secondary"))">@userRequestForTopic.Status</span>
+                                <br />
+                                <small>@userRequestForTopic.ScheduledDateTime?.ToString("g")</small>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not Requested</span>
+                            }
+                        </td>
+                        <td>
+                            @if (userRequestForTopic != null)
+                            {
+                                <small>@userRequestForTopic.ScheduledDateTime?.ToString("g")</small>
+                            }
+                        </td>
+                        <td>
+                            @if (userRequestForTopic == null)
+                            {
+                                <a asp-action="RequestInterview" asp-route-topicId="@topic.Id" class="btn btn-primary btn-sm">Request Interview</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- Add more content or features here as needed -->
-<div>
-    <h3>Your Information</h3>
-    <p>Email: @User.Identity.Name</p>
-    <p>Role: @User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value</p>
-</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>// Order Details Chart
+        const ctx1 = document.getElementById('orderDetailsChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: [10, 20, 30, 40, 50, 60],
+                datasets: [
+                    { label: 'Order Value', data: [400, 500, 600, 700, 800, 900], borderColor: 'blue' },
+                    { label: 'Users', data: [300, 400, 500, 600, 700, 800], borderColor: 'red' }
+                ]
+            },
+            options: {}
+        });
 
-<div>
-    <h3>Actions</h3>
-    <ul>
-        <li><a href="/Account/Logout">Logout</a></li>
-        <!-- Add links to other pages, features, etc. -->
-    </ul>
-</div>
+        // Sales Report Chart
+        const ctx2 = document.getElementById('salesReportChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                datasets: [
+                    { label: 'Offline Sales', data: [3000, 4000, 5000, 6000, 7000], backgroundColor: 'blue' },
+                    { label: 'Online Sales', data: [2000, 3000, 4000, 5000, 6000], backgroundColor: 'lightblue' }
+                ]
+            },
+            options: {}
+        });</script>
+}

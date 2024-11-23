@@ -7,49 +7,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
     <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+        }
+
+        .card {
+            border-radius: 20px;
+        }
+
+        .btn-google {
+            background-color: #ffffff;
+            color: #757575;
+            border: 1px solid #ddd;
+        }
+
+            .btn-google:hover {
+                background-color: #f8f8f8;
+                color: #333;
+            }
+
+        .form-control:focus {
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+            border-color: #2196f3;
+        }
+
+        .card h3 {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .text-secondary-link {
+            color: #6c757d;
+            text-decoration: none;
+        }
+
+            .text-secondary-link:hover {
+                text-decoration: underline;
+                color: #333;
+            }
+    </style>
 </head>
-<body class="bg-light">
+<body>
     <div class="d-flex justify-content-center align-items-center vh-100">
-        <div class="card shadow-lg p-4" style="width: 400px; border-radius: 15px;">
+        <div class="card shadow-lg p-5" style="width: 400px;">
             <h3 class="text-center mb-4">Welcome Back</h3>
 
+            <!-- Error Message -->
             @if (ViewBag.Error != null)
             {
                 <div class="alert alert-danger text-center">@ViewBag.Error</div>
             }
 
             <!-- Google Login Button -->
-            <div class="text-center mb-3">
-                <a href="@Url.Action("LoginWithGoogle", "Login")" class="btn btn-outline-secondary w-100">
-                    <i class="fab fa-google me-2"></i> Login with Google
+            <div class="text-center mb-4">
+                <a href="@Url.Action("LoginWithGoogle", "Login")" class="btn btn-google w-100 py-2">
+                    <i class="bi bi-google me-2"></i> Login with Google
                 </a>
             </div>
 
-            <div class="text-center mb-3">
+            <div class="text-center mb-3 text-muted">
                 <span>or login with your credentials</span>
             </div>
 
             <!-- Login Form -->
             <form method="post" asp-controller="Account" asp-action="Login">
-                <div class="mb-3">
+                <div class="mb-4">
+                    <label for="username" class="form-label fw-semibold">Username</label>
                     <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required>
                 </div>
-                <div class="mb-3">
+                <div class="mb-4">
+                    <label for="password" class="form-label fw-semibold">Password</label>
                     <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <button type="submit" class="btn btn-primary w-100 py-2">Login</button>
             </form>
 
             <!-- Additional Links -->
             <div class="text-center mt-4">
-                <a href="#" class="text-decoration-none">Forgot Password?</a>
+                <a href="#" class="text-secondary-link">Forgot Password?</a>
             </div>
             <div class="text-center mt-3">
-                <span>Don't have an account?</span>
-                <a href=# class="text-decoration-none text-primary fw-bold">Register</>
+                <span class="text-muted">Don't have an account?</span>
+                <a asp-controller="Account" asp-action="Register" class="text-primary fw-bold text-decoration-none">Register</a>
             </div>
         </div>
     </div>

@@ -38,14 +38,25 @@ namespace MockInterviews.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Topic topic)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Topics.Add(topic);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    Console.WriteLine($"Topic Name: {topic.Name}, Description: {topic.Description}");
+                    _context.Topics.Add(topic);
+                    await _context.SaveChangesAsync();
+                    Console.WriteLine("Topic saved successfully.");
+                }
+                catch (DbUpdateException ex)
+                {
+                    Console.WriteLine($"Error saving topic: {ex.Message}");
+                    Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+                }
                 return RedirectToAction(nameof(Index));
             }
             return View(topic);
         }
+
 
         // GET: Edit topic
         public async Task<IActionResult> Edit(int id)
@@ -68,7 +79,7 @@ namespace MockInterviews.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 _context.Update(topic);
                 await _context.SaveChangesAsync();

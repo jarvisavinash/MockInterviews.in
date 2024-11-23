@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MockInterviews.Data;
 
@@ -10,9 +11,11 @@ using MockInterviews.Data;
 namespace MockInterviews.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241123115056_AddCandidateIdToInterviewRequest")]
+    partial class AddCandidateIdToInterviewRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.20");
@@ -39,6 +42,9 @@ namespace MockInterviews.Migrations
                     b.Property<int>("TopicId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("TopicId1")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CandidateId");
@@ -46,6 +52,8 @@ namespace MockInterviews.Migrations
                     b.HasIndex("InterviewerId");
 
                     b.HasIndex("TopicId");
+
+                    b.HasIndex("TopicId1");
 
                     b.ToTable("InterviewRequests");
                 });
@@ -57,6 +65,7 @@ namespace MockInterviews.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -114,10 +123,14 @@ namespace MockInterviews.Migrations
                         .HasForeignKey("InterviewerId");
 
                     b.HasOne("MockInterviews.Models.Topic", "Topic")
-                        .WithMany("InterviewRequests")
+                        .WithMany()
                         .HasForeignKey("TopicId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("MockInterviews.Models.Topic", null)
+                        .WithMany("InterviewRequests")
+                        .HasForeignKey("TopicId1");
 
                     b.Navigation("Candidate");
 

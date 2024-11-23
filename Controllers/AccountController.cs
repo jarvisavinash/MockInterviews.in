@@ -102,6 +102,7 @@ namespace MockInterviews.Controllers
                 return View();
             }
 
+            // Fetch the user by email
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == username);
 
             if (user != null)
@@ -112,24 +113,31 @@ namespace MockInterviews.Controllers
 
                 if (verificationResult == PasswordVerificationResult.Success)
                 {
+                    // Add the necessary claims
                     var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // User ID (required for NameIdentifier)
+                new Claim(ClaimTypes.Name, user.Email), // Email of the user
+                new Claim(ClaimTypes.Role, user.Role)  // Role of the user
             };
 
+                    // Create the ClaimsIdentity and principal
                     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     var principal = new ClaimsPrincipal(identity);
 
+                    // Sign in the user
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
+                    // Redirect to Dashboard
                     return RedirectToAction("Dashboard", "Account");
                 }
             }
 
+            // Return error if user not found or password mismatch
             ViewBag.Error = "Invalid username or password.";
             return View();
         }
+
 
 
         // GET: Google Login Initiate
@@ -186,12 +194,91 @@ namespace MockInterviews.Controllers
         // GET: Dashboard
         public IActionResult Dashboard()
         {
-            var userId = 1; // This should be retrieved from session or authentication token
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (!int.TryParse(userIdClaim, out int userId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Fetch topics (replace this if it's related to any other model)
+            var topics = _context.Topics.ToList();
+
+            // Fetch user-specific interview requests, filter by CandidateId (ensure it exists in your model)
             var userRequests = _context.InterviewRequests
-                .Where(r => r.Id == userId)
+                .Where(r => r.CandidateId == userId)
+                .Include(r => r.Topic)  // Ensure you also include the related Topic
                 .ToList();
 
-            return View(userRequests);
+            // Prepare view model
+            var viewModel = new DashboardViewModel
+            {
+                Topics = topics,
+                UserRequests = userRequests
+            };
+
+            ViewBag.UserName = user.Email;
+            return View(viewModel);
+        }
+
+
+
+
+        [HttpPost]
+        public IActionResult RequestInterview(int topicId)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Check if the user has already requested an interview for this topic
+            var existingRequest = _context.InterviewRequests
+                .FirstOrDefault(r => r.CandidateId == userId && r.TopicId == topicId);  // Use CandidateId instead of UserId
+
+            if (existingRequest == null)
+            {
+                // Create a new interview request
+                var interviewRequest = new InterviewRequest
+                {
+                    CandidateId = userId,  // Use CandidateId here
+                    TopicId = topicId,
+                    Status = "Waiting",
+                    ScheduledDateTime = null
+                };
+
+                _context.InterviewRequests.Add(interviewRequest);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("Dashboard", "Account");
+        }
+
+
+
+
+
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Account");
         }
     }
 }
