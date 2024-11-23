@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Candidate Dashboard";
+}
+
+<h2>My Interview Requests</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Topic</th>
+            <th>Status</th>
+            <th>Scheduled Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.Topic</td>
+                <td>@request.Status</td>
+                <td>@request.ScheduledDateTime?.ToString("g")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a asp-action="CreateRequest" asp-controller="Interview" class="btn btn-success">Request Interview</a>

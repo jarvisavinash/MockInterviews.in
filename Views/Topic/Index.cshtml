@@ -1,0 +1,27 @@
+﻿@model IEnumerable<MockInterviews.Models.Topic>
+
+<h2>Manage Topics</h2>
+
+<a asp-action="Create" class="btn btn-primary">Add New Topic</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var topic in Model)
+        {
+            <tr>
+                <td>@topic.Id</td>
+                <td>@topic.Name</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@topic.Id" class="btn btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@topic.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

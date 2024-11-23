@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Manage Requests";
+}
+<h2>Interview Requests</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Candidate</th>
+            <th>Topic</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.Candidate.Name</td>
+                <td>@request.Topic</td>
+                <td>@request.Status</td>
+                <td>
+                    @if (request.Status == "Waiting")
+                    {
+                        <a asp-action="ScheduleInterview" asp-route-id="@request.Id" class="btn btn-primary">Schedule</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

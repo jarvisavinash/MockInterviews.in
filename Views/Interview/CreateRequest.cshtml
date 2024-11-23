@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Request Interview";
+}
+
+<h2>Request Interview</h2>
+<form method="post" asp-action="CreateRequest">
+    <div class="form-group">
+        <label>Topic</label>
+        <select name="TopicId" class="form-control">
+            @foreach (var topic in ViewBag.Topics)
+            {
+                <option value="@topic.Id">@topic.Name</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Request</button>
+</form>
